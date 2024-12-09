@@ -1,8 +1,14 @@
 import React from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { useDispatch } from 'react-redux';
+import { registerUser } from '../../redux/userThunk';
+import { useNavigate } from 'react-router-dom';
 
 function Register() {
+
+  const dispatch=useDispatch()
+  const navigate=useNavigate()
   const formik = useFormik({
     initialValues: {
       username: '',
@@ -24,9 +30,14 @@ function Register() {
         .oneOf([Yup.ref('password'), null], 'Passwords must match')
         .required('Confirm Password is required'),
     }),
-    onSubmit: (values) => {
+    onSubmit: async(values) => {
       console.log('Form Values:', values);
       alert('Registration Successful');
+      const res=await dispatch(registerUser(values))
+      console.log(res,"response")
+      if(res.payload.message=="created"){
+        navigate('/login')
+      }
     },
   });
 

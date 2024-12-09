@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-// import { login } from "./userThunk";
+import { loginUser } from "./userThunk";
 
 // Safely parse localStorage data with fallback
 const getLocalStorageData = () => {
@@ -24,7 +24,13 @@ const userSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-   
+     builder
+     .addCase(loginUser.fulfilled, (state, action) => {
+      const data= action.payload.data; 
+      localStorage.setItem("data", JSON.stringify(data)); 
+      state.data =data
+
+    })
   },
 });
 

@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { addBlog } from '../redux/userThunk';
+import { Toaster,toast } from 'sonner';
+import { useDispatch, useSelector } from 'react-redux';
 
 function AddBlog() {
   const [newBlog, setNewBlog] = useState({
@@ -8,32 +11,64 @@ function AddBlog() {
     image: '',
   });
   const navigate = useNavigate();
-
+  const dispatch=useDispatch()
+  const userData = useSelector((state) => state.user.data);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewBlog({ ...newBlog, [name]: value });
   };
 
+  // const handleFileChange = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onload = () => {
+  //       setNewBlog((prev) => ({ ...prev, image: reader.result }));
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
+
+  const handleAddBlog = async (e) => {
+    e.preventDefault();
+  
+    const formData = new FormData();
+    formData.append('title', newBlog.title);
+    formData.append('description', newBlog.description);
+    formData.append('image', newBlog.image);
+    formData.append("id", userData._id);
+  
+    try {
+      const resultAction = await dispatch(addBlog(formData));
+  
+      if (addBlog.fulfilled.match(resultAction)) {
+        toast.success('Blog added successfully!');
+        navigate('/'); // Redirect to home page
+      } else {
+        // Extract error message from the payload
+        const errorMessage =
+          resultAction.payload?.message || 'Failed to add blog';
+        throw new Error(errorMessage);
+      }
+    } catch (error) {
+      // Display only the error message to the user
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred';
+      toast.error(errorMessage);
+    }
+  };
+  
+  
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setNewBlog((prev) => ({ ...prev, image: reader.result }));
-      };
-      reader.readAsDataURL(file);
+      setNewBlog((prev) => ({ ...prev, image: file })); // Store the raw file
     }
   };
-
-  const handleAddBlog = (e) => {
-    e.preventDefault();
-    // Save the blog to your server or shared state management solution here
-    console.log('Blog submitted:', newBlog);
-    navigate('/'); // Redirect back to home page
-  };
+  
 
   return (
     <div className="min-h-screen bg-primary p-6">
+      <Toaster position='top-right'/>
       <form
         onSubmit={handleAddBlog}
         className="bg-secondary p-6 mt-6 rounded shadow-md max-w-md mx-auto"

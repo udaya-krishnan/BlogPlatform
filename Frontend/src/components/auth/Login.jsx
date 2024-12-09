@@ -1,8 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { useDispatch } from 'react-redux';
+import {useNavigate} from 'react-router-dom'
+import { loginUser } from '../../redux/userThunk';
+import { Toaster, toast } from 'sonner'
+
 
 function Login() {
+
+  const dispatch=useDispatch()
+  const navigate=useNavigate()
+  const [num,setNum]=useState(0)
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -16,14 +25,39 @@ function Login() {
         .min(6, 'Password must be at least 6 characters')
         .required('Password is required'),
     }),
-    onSubmit: (values) => {
+    onSubmit: async(values) => {
       console.log('Form Values:', values);
-      alert('Login successful');
+      // alert('Login successful');
+
+      const res=await dispatch(loginUser(values))
+      console.log(res,"response")
+
+      if(res.payload.status==="usernotfound"){
+        toast.error('User Not Found')
+      }else if (res.payload.status=="incorrect"){
+        toast.error('Incorrect Password')
+      }else if(res.payload.status=="success"){
+        toast.success('Login success')
+        navigate('/')
+      }
     },
   });
 
+  useEffect(()=>{
+   const intervel=setInterval(()=>{
+      const number= num+1
+      setNum(number)
+    },1000)
+
+    return clearInterval(intervel)
+  },[num,setNum])
+ 
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-primary">
+    <Toaster position="top-right" />
+
+    <h1>{num}</h1>
       <div className="bg-secondary text-dark p-8 rounded-md shadow-md w-full max-w-md">
         <h2 className="text-center text-2xl font-bold mb-6">Login</h2>
         <form onSubmit={formik.handleSubmit}>
