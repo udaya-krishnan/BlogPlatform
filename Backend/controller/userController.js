@@ -24,7 +24,7 @@ const securePassword = async (password) => {
  const register=async(req,res)=>{
     try {
         const {username,email,password}=req.body
-        console.log(username,email,password);
+        console.log(username,email,password,"register data");
         const hashPassword=await securePassword(password)
         const createUser=await User.create({
             username:username,
