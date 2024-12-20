@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch } from 'react-redux';
-import {useNavigate} from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom';
 import { loginUser } from '../../redux/userThunk';
 import { Toaster, toast } from 'sonner'
 
@@ -119,7 +119,17 @@ function Login() {
           >
             Login
           </button>
+
+          
         </form>
+        <div className="mt-4 text-center">
+          <p className="text-sm text-dark">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-accent font-bold hover:underline">
+              Create one
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
