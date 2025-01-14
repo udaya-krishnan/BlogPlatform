@@ -2,6 +2,11 @@ const User=require("../model/userModel")
 const Blog=require("../model/blogModel")
 const bcrypt = require("bcrypt");
 const { generateTokens } = require("../utils/token");
+const fs = require('fs');
+const {b2,getAuthorizationToken}=require('../utils/backblaze')
+const cloudinary = require('../utils/cloudinaryConfig');
+const path = require('path');
+
 
 
 
@@ -95,7 +100,9 @@ const uploadBlog = async (req, res) => {
     }
 
     const { title,description, id } = req.body;
-    const imagePath = `/public/${req.file.filename}`;  // Adjust the path as needed for your frontend
+    console.log(req.file)
+
+    const imagePath = await uploadImage(req.file.path)  // Adjust the path as needed for your frontend
 
     console.log(title, id, imagePath);  // Debugging info
 
@@ -193,6 +200,25 @@ const updateBlog = async (req, res) => {
     res.status(500).json({ message: 'Error updating blog', error });
   }
 };
+
+
+// Upload an image to Cloudinary
+const uploadImage = async (filePath) => {
+  try {
+    const result = await cloudinary.uploader.upload(filePath, {
+      folder: 'your_folder_name', 
+    });
+    console.log('Image uploaded successfully:', result.secure_url);
+    return result.secure_url;
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    throw error;
+  }
+};
+
+
+
+
 
 
 
