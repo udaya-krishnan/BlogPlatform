@@ -187,7 +187,7 @@ const updateBlog = async (req, res) => {
 
   
     if (req.file) {
-      const imagePath = `/public/${req.file.filename}`; 
+      const imagePath = await uploadImage(req.file.path) 
       blog.image = imagePath;
     }
 
